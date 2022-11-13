@@ -17,7 +17,7 @@ func (u *User) Validate() error {
 	return validation.ValidateStruct(
 		u,
 		validation.Field(&u.Email, validation.Required, is.Email),
-		validation.Field(&u.Password, validation.Required, validation.Length(8, 100)),
+		validation.Field(&u.Password, validation.By(requiredIf(u.PasswordHash == "")), validation.Length(8, 100)),
 	)
 }
 
