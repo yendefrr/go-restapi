@@ -26,6 +26,23 @@ func (r *UserRepository) Create(u *model.User) error {
 	return r.store.db.QueryRow(fmt.Sprintf("SELECT `id` FROM `users` WHERE `email` = '%s'", u.Email)).Scan(&u.ID)
 }
 
+func (r *UserRepository) Find(id int) (*model.User, error) {
+	u := &model.User{}
+	if err := r.store.db.QueryRow(
+		fmt.Sprintf("SELECT `id`, `email`, `password_hash` FROM `users` WHERE `id` = '%d'", id)).Scan(
+		&u.ID,
+		&u.Email,
+		&u.PasswordHash,
+	); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, store.ErrRecordNotFound
+		}
+
+		return nil, err
+	}
+
+	return u, nil
+}
 func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	u := &model.User{}
 	if err := r.store.db.QueryRow(
